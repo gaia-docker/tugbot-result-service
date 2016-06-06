@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>WebSocket Example</title>
+</head>
+<body>
+<div id="output"></div>
+<script type="text/javascript">
+    var output = document.getElementById("output");
+    var ws;
+    var print = function(message) {
+        var d = document.createElement("div");
+        d.innerHTML = message;
+        output.appendChild(d);
+    };
+
+    (function() {
+        ws = new WebSocket("{{.}}");
+        console.log('Opened web socket connection ' + ws.url);
+        ws.onclose = function(evt) {
+            print("Connection closed");
+            console.log('Connection closed ' + evt.data);
+        }
+        ws.onmessage = function(evt) {
+            console.log('Data received ' + evt.data);
+            print("Message: " + evt.data);
+        }
+    })();
+</script>
+</body>
+</html>
