@@ -1,7 +1,7 @@
 FROM golang:1.6-alpine
 
-ENV TUGBOT_DIR /go/src/github.com/gaia-docker/tugbot-result-service
-WORKDIR $TUGBOT_DIR
+ENV TUGBOT_RESULT_SERVICE_DIR /go/src/github.com/gaia-docker/tugbot-result-service
+WORKDIR $TUGBOT_RESULT_SERVICE_DIR
 
 # install Git apk
 RUN apk --update add git bash \
@@ -24,7 +24,7 @@ RUN go get -v golang.org/x/tools/cmd/cover
 # go-junit-report - convert Go test into junit.xml format
 RUN go get -v github.com/jstemmer/go-junit-report
 
-COPY . $TUGBOT_DIR
+COPY . $TUGBOT_RESULT_SERVICE_DIR
 RUN chmod u+x script/go_build.sh script/coverage.sh
 
 CMD ["script/go_build.sh"]

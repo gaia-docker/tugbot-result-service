@@ -22,7 +22,7 @@ dependencies:
     - docker tag gaiadocker/tugbot-result-service gaiadocker/tugbot-result-service:$CIRCLE_BRANCH
 test:
   override:
-    # run tugbot-result-service tests and generate junit.xml reports
+    # run tugbot-result-service coverage script
     - docker run --rm -v "$PWD":/go/src/github.com/gaia-docker/tugbot-result-service gaiadocker/tugbot-result-service-builder script/coverage.sh
   post:
     # copy test results
