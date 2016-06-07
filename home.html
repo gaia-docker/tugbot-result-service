@@ -26,6 +26,13 @@
             print("Message: " + evt.data);
         }
     })();
+
+    window.onbeforeunload = function (event) {
+        if (ws != undefined) {
+            ws.onclose = function () {}; // disable onclose handler first
+            ws.close();
+        }
+    };
 </script>
 </body>
 </html>
