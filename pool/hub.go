@@ -38,8 +38,8 @@ func (h *Hub) Run() {
 		case conn := <-h.unregister:
 			if _, ok := h.connections[conn]; ok {
 				h.closeConnection(conn)
+				log.Infof("Unregistered connection. There are %d connections", len(h.connections))
 			}
-			log.Infof("Unregistered connection. There are %d connections", len(h.connections))
 		case message := <-h.broadcast:
 			log.Debugf("Going to broadcast message to connections: %s", message)
 			for conn := range h.connections {
