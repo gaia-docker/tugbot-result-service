@@ -13,7 +13,7 @@ dependencies:
   override:
     - chmod u+x script/go_build.sh script/coverage.sh
     # create builder image
-    - docker build -t gaiadocker/tugbot-result-service-builder -f Dockerfile.build .
+    - docker build -t gaiadocker/tugbot-result-service-builder -f dockerbuilder/Dockerfile.build .
     # run go build in a docker container
     - docker run --rm -v "$PWD":/go/src/github.com/gaia-docker/tugbot-result-service gaiadocker/tugbot-result-service-builder script/go_build.sh
     # create tugbot-result-service docker image
