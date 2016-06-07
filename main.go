@@ -3,12 +3,12 @@ package main
 import (
 	"errors"
 	"flag"
-	logger "github.com/Sirupsen/logrus"
+	log "github.com/Sirupsen/logrus"
+	"github.com/gaia-docker/tugbot-result-service/pool"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/websocket"
 	"html/template"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"net/url"
 )
@@ -21,35 +21,40 @@ var homeTemplate = template.Must(template.ParseFiles("home.html"))
 
 var wsAddress = url.URL{Scheme: "ws", Host: *address, Path: "/echo"}
 
+var hub = pool.NewHub()
+
 func main() {
 	flag.Parse()
+	go hub.Run()
 	router := mux.NewRouter().StrictSlash(true)
 	router.HandleFunc("/", home).Methods("GET")
 	router.HandleFunc("/echo", echo).Methods("GET")
 	router.HandleFunc("/upload-data", upload).Methods("POST")
-	logger.Fatal(http.ListenAndServe(*address, router))
+	log.Fatal(http.ListenAndServe(*address, router))
 }
 
 func echo(w http.ResponseWriter, r *http.Request) {
 
-	conn, err := upgrader.Upgrade(w, r, nil)
+	ws, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
-		logger.Errorf("Error during upgrade to web socket protocol %+v", err)
+		log.Println(err)
 		return
 	}
-	defer conn.Close()
-	mt, message, err := conn.ReadMessage()
-	if err != nil {
-		logger.Errorf("Error while reading from web socket %+v", err)
-	}
-	logger.Infof("echo Receive: %s", message)
-	err = conn.WriteMessage(mt, message)
-	if err != nil {
-		logger.Errorf("Error while writing to web socket %+v", err)
-	}
+	log.Infof("New websocket connection established %s", wsAddress.String())
+	conn := pool.NewConnection(ws, make(chan []byte, 256))
+	hub.Register(conn)
+	go conn.Listen(hub.Unregister)
 }
 
 func home(w http.ResponseWriter, r *http.Request) {
+	if r.URL.Path != "/" {
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		return
+	}
+	if r.Method != "GET" {
+		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
+		return
+	}
 	homeTemplate.Execute(w, wsAddress.String())
 }
 
@@ -59,26 +64,9 @@ func upload(writer http.ResponseWriter, request *http.Request) {
 	body, err := getBody(request)
 	if err != nil {
 		retStatus = http.StatusBadRequest
-		logger.Error("Error fetching request body. ", err)
+		log.Error("Error fetching request body. ", err)
 	} else {
-		logger.Infof("connecting to %s", wsAddress.String())
-
-		conn, _, err := websocket.DefaultDialer.Dial(wsAddress.String(), nil)
-		if err != nil {
-			logger.Fatal("dial:", err)
-		}
-		defer conn.Close()
-		err = conn.WriteMessage(websocket.TextMessage, []byte(*body))
-		if err != nil {
-			logger.Errorf("Error in writing to web socket %+v", err)
-			return
-		}
-		var msg = make([]byte, 512)
-		_, msg, err = conn.ReadMessage()
-		if err != nil {
-			log.Fatal(err)
-		}
-		logger.Infof("upload Receive: %s", msg)
+		hub.Broadcast(body)
 	}
 	writer.WriteHeader(retStatus)
 }
@@ -91,7 +79,7 @@ func getBody(request *http.Request) (*string, error) {
 	}
 	body, err := ioutil.ReadAll(requestBody)
 	if err != nil {
-		logger.Error(err)
+		log.Error(err)
 		return nil, err
 	}
 	ret := string(body)
