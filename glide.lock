@@ -1,5 +1,5 @@
-hash: 54e5580bc816220c819d4155096dd66e7ebf97c562a345c8f642436cbd44ac5b
-updated: 2016-06-08T08:15:35.324485+03:00
+hash: 582a366c4442be552e697c8a0871620c5a7584055af612ba254f3775702013a1
+updated: 2016-06-08T10:26:18.2218404+03:00
 imports:
 - name: github.com/gorilla/context
   version: aed02d124ae4a0e94fea4541c8effd05bf0c8296
@@ -17,6 +17,11 @@ imports:
   version: 081307d9bc1364753142d5962fc1d795c742baaf
   subpackages:
   - github.com\Sirupsen\logrus
+- name: github.com/stretchr/testify
+  version: 8d64eb7173c7753d6419fd4a9caf057398611364
+  subpackages:
+  - github.com\stretchr\testify\assert
+  - assert
 - name: golang.org/x/sys
   version: f64b50fbea64174967a8882830d621a18ee1548e
   subpackages:

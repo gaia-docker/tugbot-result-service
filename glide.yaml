@@ -9,3 +9,6 @@ import:
 - package: github.com/gorilla/websocket
   subpackages:
   - github.com\gorilla\websocket
+- package: github.com/stretchr/testify/assert
+  subpackages:
+  - github.com\stretchr\testify\assert
