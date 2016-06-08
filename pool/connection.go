@@ -5,7 +5,7 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-// Conn is an middleman between the websocket connection and the hub.
+// Connection is an middleman between the websocket connection and the hub.
 type Connection struct {
 	// The websocket connection.
 	ws *websocket.Conn
@@ -16,6 +16,7 @@ type Connection struct {
 
 type closeHandler func(*Connection)
 
+// NewConnection creates new instance of Connection
 func NewConnection(ws *websocket.Conn, send chan []byte) *Connection {
 
 	return &Connection{send: make(chan []byte, 256), ws: ws}

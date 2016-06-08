@@ -18,7 +18,7 @@ type Hub struct {
 	unregister chan *Connection
 }
 
-// Created Hub instance
+// NewHub creates Hub instance
 func NewHub() *Hub {
 
 	return &Hub{
@@ -55,13 +55,13 @@ func (h *Hub) Run() {
 	}
 }
 
-// Registers the given connection to the hub
+// Register the given connection to the hub
 func (h *Hub) Register(conn *Connection) {
 
 	h.register <- conn
 }
 
-// Unregisters the given connection from the hub
+// Unregister the given connection from the hub
 func (h *Hub) Unregister(conn *Connection) {
 
 	h.unregister <- conn
