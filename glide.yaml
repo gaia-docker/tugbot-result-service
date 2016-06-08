@@ -1,0 +1,11 @@
+package: github.com/gaia-docker/tugbot-result-service
+import:
+- package: github.com/Sirupsen/logrus
+  subpackages:
+  - github.com\Sirupsen\logrus
+- package: github.com/gorilla/mux
+  subpackages:
+  - github.com\gorilla\mux
+- package: github.com/gorilla/websocket
+  subpackages:
+  - github.com\gorilla\websocket
