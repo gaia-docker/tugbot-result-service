@@ -37,7 +37,7 @@ func echo(w http.ResponseWriter, r *http.Request) {
 
 	ws, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
-		log.Errorf("Failed upgrading connection to web socket", err)
+		log.Errorf("Failed upgrading connection to web socket %+v", err)
 		return
 	}
 	log.Infof("New websocket connection established %s", wsAddress.String())

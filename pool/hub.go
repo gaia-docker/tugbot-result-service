@@ -2,7 +2,7 @@ package pool
 
 import log "github.com/Sirupsen/logrus"
 
-// hub maintains the set of active connections and broadcasts messages to the
+// Hub maintains the set of active connections and broadcasts messages to the
 // connections.
 type Hub struct {
 	// Registered connections.
@@ -18,6 +18,7 @@ type Hub struct {
 	unregister chan *Connection
 }
 
+// Created Hub instance
 func NewHub() *Hub {
 
 	return &Hub{
@@ -28,6 +29,7 @@ func NewHub() *Hub {
 	}
 }
 
+// Run hub channel loop, should be used with go routine (go hub.Run())
 func (h *Hub) Run() {
 
 	for {
@@ -53,16 +55,19 @@ func (h *Hub) Run() {
 	}
 }
 
+// Registers the given connection to the hub
 func (h *Hub) Register(conn *Connection) {
 
 	h.register <- conn
 }
 
+// Unregisters the given connection from the hub
 func (h *Hub) Unregister(conn *Connection) {
 
 	h.unregister <- conn
 }
 
+// Broadcast message to all hub connections
 func (h *Hub) Broadcast(message *string) {
 
 	h.broadcast <- []byte(*message)
