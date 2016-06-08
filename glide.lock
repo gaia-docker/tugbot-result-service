@@ -1,0 +1,24 @@
+hash: 54e5580bc816220c819d4155096dd66e7ebf97c562a345c8f642436cbd44ac5b
+updated: 2016-06-08T08:15:35.324485+03:00
+imports:
+- name: github.com/gorilla/context
+  version: aed02d124ae4a0e94fea4541c8effd05bf0c8296
+  subpackages:
+  - github.com\gorilla\context
+- name: github.com/gorilla/mux
+  version: 9fa818a44c2bf1396a17f9d5a3c0f6dd39d2ff8e
+  subpackages:
+  - github.com\gorilla\mux
+- name: github.com/gorilla/websocket
+  version: a68708917c6a4f06314ab4e52493cc61359c9d42
+  subpackages:
+  - github.com\gorilla\websocket
+- name: github.com/Sirupsen/logrus
+  version: 081307d9bc1364753142d5962fc1d795c742baaf
+  subpackages:
+  - github.com\Sirupsen\logrus
+- name: golang.org/x/sys
+  version: f64b50fbea64174967a8882830d621a18ee1548e
+  subpackages:
+  - golang.org\x\sys\unix
+devImports: []
