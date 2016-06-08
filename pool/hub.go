@@ -1,6 +1,9 @@
 package pool
 
-import log "github.com/Sirupsen/logrus"
+import (
+	log "github.com/Sirupsen/logrus"
+	"sync"
+)
 
 // Hub maintains the set of active connections and broadcasts messages to the
 // connections.
@@ -11,11 +14,7 @@ type Hub struct {
 	// Inbound messages from the Connections.
 	broadcast chan []byte
 
-	// Register requests from the connections.
-	register chan *Connection
-
-	// Unregister requests from connections.
-	unregister chan *Connection
+	mutex *sync.Mutex
 }
 
 // NewHub creates Hub instance
@@ -23,9 +22,8 @@ func NewHub() *Hub {
 
 	return &Hub{
 		broadcast:   make(chan []byte),
-		register:    make(chan *Connection),
-		unregister:  make(chan *Connection),
 		connections: make(map[*Connection]bool),
+		mutex:       &sync.Mutex{},
 	}
 }
 
@@ -34,14 +32,6 @@ func (h *Hub) Run() {
 
 	for {
 		select {
-		case conn := <-h.register:
-			h.connections[conn] = true
-			log.Infof("New connection registered. There are %d connections", len(h.connections))
-		case conn := <-h.unregister:
-			if _, ok := h.connections[conn]; ok {
-				h.closeConnection(conn)
-				log.Infof("Unregistered connection. There are %d connections", len(h.connections))
-			}
 		case message := <-h.broadcast:
 			log.Debugf("Going to broadcast message to connections: %s", message)
 			for conn := range h.connections {
@@ -58,18 +48,30 @@ func (h *Hub) Run() {
 // Register the given connection to the hub
 func (h *Hub) Register(conn *Connection) {
 
-	h.register <- conn
+	h.mutex.Lock()
+	defer h.mutex.Unlock()
+	h.connections[conn] = true
+	log.Infof("New connection registered. There are %d connections", len(h.connections))
 }
 
 // Unregister the given connection from the hub
 func (h *Hub) Unregister(conn *Connection) {
 
-	h.unregister <- conn
+	h.mutex.Lock()
+	defer h.mutex.Unlock()
+	if _, ok := h.connections[conn]; ok {
+		h.closeConnection(conn)
+		log.Infof("Unregistered connection. There are %d connections", len(h.connections))
+	} else {
+		log.Warningf("Connection <%+v> is not registered", conn)
+	}
 }
 
 // Broadcast message to all hub connections
 func (h *Hub) Broadcast(message *string) {
 
+	h.mutex.Lock()
+	defer h.mutex.Unlock()
 	h.broadcast <- []byte(*message)
 }
 

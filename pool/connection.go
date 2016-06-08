@@ -1,6 +1,7 @@
 package pool
 
 import (
+	"fmt"
 	log "github.com/Sirupsen/logrus"
 	"github.com/gorilla/websocket"
 )
@@ -44,6 +45,11 @@ func (c *Connection) Listen(onClose closeHandler) {
 			}
 		}
 	}
+}
+
+func (c *Connection) String() string {
+
+	return fmt.Sprintf("Connection: %+v", c.ws)
 }
 
 // write writes a message with the given message type and payload.
