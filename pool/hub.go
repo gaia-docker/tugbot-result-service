@@ -30,10 +30,20 @@ func NewHub() *Hub {
 // Run hub channel loop, should be used with go routine (go hub.Run())
 func (h *Hub) Run() {
 
+	defer func() {
+		for conn := range h.connections {
+			h.closeConnection(conn)
+		}
+	}()
 	for {
 		select {
-		case message := <-h.broadcast:
+		case message, ok := <-h.broadcast:
+			if !ok {
+				log.Infof("Hub is shutting down..")
+				return
+			}
 			log.Infof("Going to broadcast message to connections: %s", message)
+			h.mutex.Lock()
 			for conn := range h.connections {
 				select {
 				case conn.send <- message:
@@ -41,6 +51,7 @@ func (h *Hub) Run() {
 					h.closeConnection(conn)
 				}
 			}
+			h.mutex.Unlock()
 		}
 	}
 }
@@ -70,8 +81,6 @@ func (h *Hub) Unregister(conn *Connection) {
 // Broadcast message to all hub connections
 func (h *Hub) Broadcast(message *string) {
 
-	h.mutex.Lock()
-	defer h.mutex.Unlock()
 	h.broadcast <- []byte(*message)
 }
 
