@@ -33,7 +33,7 @@ func (h *Hub) Run() {
 	for {
 		select {
 		case message := <-h.broadcast:
-			log.Debugf("Going to broadcast message to connections: %s", message)
+			log.Infof("Going to broadcast message to connections: %s", message)
 			for conn := range h.connections {
 				select {
 				case conn.send <- message:
@@ -77,6 +77,7 @@ func (h *Hub) Broadcast(message *string) {
 
 func (h *Hub) closeConnection(conn *Connection) {
 
+	log.Infof("Closing connection: %+v", conn)
 	delete(h.connections, conn)
 	close(conn.send)
 }

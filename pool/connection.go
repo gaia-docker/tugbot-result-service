@@ -18,7 +18,7 @@ type Connection struct {
 type closeHandler func(*Connection)
 
 // NewConnection creates new instance of Connection
-func NewConnection(ws *websocket.Conn, send chan []byte) *Connection {
+func NewConnection(ws *websocket.Conn) *Connection {
 
 	return &Connection{send: make(chan []byte, 256), ws: ws}
 }
@@ -38,7 +38,7 @@ func (c *Connection) Listen(onClose closeHandler) {
 				log.Infof("Closing websocket connection...")
 				return
 			}
-			log.Debug("Going to publish message to websocket...")
+			log.Info("Going to publish message to websocket...")
 			if err := c.write(websocket.TextMessage, message); err != nil {
 				log.Errorf("Failed writing to websocket: %v", err)
 				return

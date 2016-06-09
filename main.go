@@ -13,7 +13,11 @@ import (
 	"net/url"
 )
 
+const defaultLogLevel = log.DebugLevel
+
 var address = flag.String("address", "localhost:8080", "http service address")
+
+var loglevel = flag.String("loglevel", defaultLogLevel.String(), "log level")
 
 var upgrader = websocket.Upgrader{} // use default options
 
@@ -23,8 +27,18 @@ var wsAddress = url.URL{Scheme: "ws", Host: *address, Path: "/echo"}
 
 var hub = pool.NewHub()
 
-func main() {
+func init() {
+
 	flag.Parse()
+	level, err := log.ParseLevel(*loglevel)
+	if err != nil {
+		level = defaultLogLevel
+	}
+	log.SetLevel(level)
+}
+
+func main() {
+
 	go hub.Run()
 	router := mux.NewRouter().StrictSlash(true)
 	router.HandleFunc("/", home).Methods("GET")
@@ -41,7 +55,7 @@ func echo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	log.Infof("New websocket connection established %s", wsAddress.String())
-	conn := pool.NewConnection(ws, make(chan []byte, 256))
+	conn := pool.NewConnection(ws)
 	hub.Register(conn)
 	go conn.Listen(hub.Unregister)
 }
