@@ -52,4 +52,5 @@ func TestBroadcast(t *testing.T) {
 	hub.Register(connection1)
 	message := "hello world"
 	hub.Broadcast(&message)
+	hub.Unregister(connection1)
 }
