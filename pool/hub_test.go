@@ -1,7 +1,6 @@
 package pool
 
 import (
-	log "github.com/Sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -9,7 +8,6 @@ import (
 func TestRegister(t *testing.T) {
 
 	var hub = NewHub()
-	log.Info("TestRegister")
 	hub.Register(NewConnection(nil))
 	assert.Len(t, hub.connections, 1, "Number of connections should be 1")
 }
@@ -17,7 +15,6 @@ func TestRegister(t *testing.T) {
 func TestUnregister(t *testing.T) {
 
 	var hub = NewHub()
-	log.Info("TestUnregister")
 	connection1 := NewConnection(nil)
 	connection2 := NewConnection(nil)
 	hub.Register(connection1)
@@ -32,7 +29,6 @@ func TestUnregister(t *testing.T) {
 func TestUnregisterNoConnections(t *testing.T) {
 
 	var hub = NewHub()
-	log.Info("TestUnregisterNoConnections")
 	connection1 := NewConnection(nil)
 	hub.Unregister(connection1)
 	assert.Len(t, hub.connections, 0, "Number of connections should be 0")
@@ -45,10 +41,24 @@ func TestBroadcast(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	log.Info("TestBroadcast")
 	go hub.Run()
 	connection1 := NewConnection(ws)
 	go connection1.Listen(hub.Unregister)
+	hub.Register(connection1)
+	message := "hello world"
+	hub.Broadcast(&message)
+	hub.Unregister(connection1)
+}
+
+func TestBroadcastWithConnectionNotListening(t *testing.T) {
+
+	var hub = NewHub()
+	ws, err := GetWebsocketConnMock()
+	if err != nil {
+		t.Fatal(err)
+	}
+	go hub.Run()
+	connection1 := NewConnection(ws)
 	hub.Register(connection1)
 	message := "hello world"
 	hub.Broadcast(&message)
