@@ -3,13 +3,8 @@ FROM golang:1.6
 ENV TUGBOT_RESULT_SERVICE_DIR /go/src/github.com/gaia-docker/tugbot-result-service
 WORKDIR $TUGBOT_RESULT_SERVICE_DIR
 
-# install Git apk
-RUN apk --update add git bash \
-    && rm -rf /var/lib/apt/lists/* \
-    && rm /var/cache/apk/*
-
 # install glide package manager
-RUN curl -Ls https://github.com/Masterminds/glide/releases/download/0.10.1/glide-0.10.1-linux-amd64.tar.gz | tar xz -C /tmp \
+RUN curl -L https://github.com/Masterminds/glide/releases/download/0.10.1/glide-0.10.1-linux-amd64.tar.gz | tar xz -C /tmp \
  && mv /tmp/linux-amd64/glide /usr/bin/
 
 # gox - Go cross compile tool
