@@ -38,7 +38,7 @@ func main() {
 	router := mux.NewRouter().StrictSlash(true)
 	router.HandleFunc("/", home).Methods("GET")
 	router.Handle("/echo", websocket.NewEchoHandler(hub)).Methods("GET")
-	router.Handle("/upload-data", dataupload.NewUploadHandler(hub)).Methods("POST")
+	router.Handle("/results", dataupload.NewUploadHandler(hub)).Methods("POST")
 	log.Fatal(http.ListenAndServe(*address, router))
 }
 
