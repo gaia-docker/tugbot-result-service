@@ -8,8 +8,11 @@ RUN apk --update add git bash \
     && rm -rf /var/lib/apt/lists/* \
     && rm /var/cache/apk/*
 
+RUN apk add ca-certificates
+RUN update-ca-certificates
+
 # install glide package manager
-RUN wget -Y on https://github.com/Masterminds/glide/releases/download/0.10.1/glide-0.10.1-linux-amd64.tar.gz | tar xz -C /tmp \
+RUN wget https://github.com/Masterminds/glide/releases/download/0.10.1/glide-0.10.1-linux-amd64.tar.gz | tar xz -C /tmp \
  && mv /tmp/linux-amd64/glide /usr/bin/
 
 # gox - Go cross compile tool
