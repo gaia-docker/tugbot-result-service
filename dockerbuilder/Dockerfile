@@ -8,8 +8,9 @@ RUN apk --update add git bash \
     && rm -rf /var/lib/apt/lists/* \
     && rm /var/cache/apk/*
 
-RUN apk add ca-certificates
-RUN update-ca-certificates
+RUN apk update \
+    && apk add ca-certificates \
+    && update-ca-certificates
 
 # install glide package manager
 RUN wget https://github.com/Masterminds/glide/releases/download/0.10.1/glide-0.10.1-linux-amd64.tar.gz | tar xz -C /tmp \
