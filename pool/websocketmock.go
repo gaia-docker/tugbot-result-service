@@ -11,7 +11,7 @@ import (
 
 var upgrader = websocket.Upgrader{}
 
-func GetWebsocketConnMock() (*websocket.Conn, error) {
+func getWebsocketConnMock() (*websocket.Conn, error) {
 
 	var ret *websocket.Conn
 	var err error

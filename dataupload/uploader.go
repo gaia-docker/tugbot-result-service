@@ -10,10 +10,12 @@ import (
 	"strings"
 )
 
+// Uploader interface
 type Uploader interface {
 	Upload(filename string)
 }
 
+// ZipUploader implements the Uploader interface
 type ZipUploader struct {
 }
 

@@ -7,13 +7,14 @@ import (
 	"net/http"
 )
 
+// EchoHandler responds to /echo http request, which is the websocket gateway
 type EchoHandler struct {
 	hub *pool.Hub
 }
 
 var upgrader = websocket.Upgrader{} // use default options
 
-// NewUploadHandler creates UploadHandler instance
+// NewEchoHandler creates EchoHandler instance
 func NewEchoHandler(hub *pool.Hub) *EchoHandler {
 
 	return &EchoHandler{

@@ -8,6 +8,7 @@ import (
 	"net/http"
 )
 
+// UploadHandler responds to /results http request, which is the result-service rest API for uploading results
 type UploadHandler struct {
 	hub *pool.Hub
 }

@@ -39,7 +39,7 @@ func TestBroadcast(t *testing.T) {
 
 	hub := NewHub()
 	go hub.Run()
-	ws, err := GetWebsocketConnMock()
+	ws, err := getWebsocketConnMock()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -57,7 +57,7 @@ func TestBroadcastWithConnectionNotListening(t *testing.T) {
 
 	hub := NewHub()
 	go hub.Run()
-	ws, err := GetWebsocketConnMock()
+	ws, err := getWebsocketConnMock()
 	if err != nil {
 		t.Fatal(err)
 	}
