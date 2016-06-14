@@ -2,10 +2,12 @@ package dataupload
 
 import (
 	"archive/zip"
+	"fmt"
 	"github.com/stretchr/testify/assert"
 	"io/ioutil"
 	"log"
 	"os"
+	"strings"
 	"testing"
 )
 
@@ -17,6 +19,7 @@ var testFiles = []struct {
 	{"readme.txt", "This archive contains some text files."},
 	{"tugbot.txt", "tugbot:\tugbot\result\nservice"},
 	{"todo.txt", "Get animal handling licence.\nWrite more examples."},
+	{"folder/", ""},
 }
 
 func TestUpload(t *testing.T) {
@@ -33,16 +36,25 @@ func TestUpload(t *testing.T) {
 	assert.NoError(t, err)
 	// check that every test file was uploaded
 	for _, f := range testFiles {
-		assert.True(t, existInTestFiles(files, f.Name))
+		assert.True(t, existInTestFiles(files, f.Name), fmt.Sprintf("%s should exist in zip file", f.Name))
 	}
 
 	cleanup(resultDir)
 }
 
+func TestUploadFileNotExist(t *testing.T) {
+
+	uploader := &ZipUploader{}
+	resultDir, err := uploader.Upload("no-file")
+
+	assert.Error(t, err)
+	assert.Nil(t, resultDir)
+}
+
 func existInTestFiles(uploadedFiles []os.FileInfo, expectedFile string) bool {
 
 	for _, f := range uploadedFiles {
-		if f.Name() == expectedFile {
+		if f.Name() == strings.TrimSuffix(expectedFile, "/") {
 			return true
 		}
 	}
