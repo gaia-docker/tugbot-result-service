@@ -1,69 +1,78 @@
 package dataupload
 
 import (
-	"archive/zip"
+	"archive/tar"
 	"fmt"
 	log "github.com/Sirupsen/logrus"
 	"io"
 	"os"
 	"path/filepath"
-	"strings"
+	"time"
 )
 
 // Uploader interface
 type Uploader interface {
-	Upload(filename string)
+	Upload(fileReader io.ReadCloser) (*string, error)
 }
 
-// ZipUploader implements the Uploader interface
-type ZipUploader struct {
+// TarUploader implements the Uploader interface
+type TarUploader struct {
 }
 
-func (zu *ZipUploader) Upload(filename string) (*string, error) {
+func (zu TarUploader) Upload(fileReader io.ReadCloser) (*string, error) {
 
-	reader, err := zip.OpenReader(filename)
-	if err != nil {
-		log.Error(err)
-		return nil, err
-	}
-	defer reader.Close()
-	resultDirName := fmt.Sprintf("resultService_%s", strings.TrimSuffix(filename, ".zip"))
+	defer fileReader.Close()
+	tarBallReader := tar.NewReader(fileReader)
+	resultDirName := fmt.Sprintf("resultService_%d", time.Now().Unix())
 	os.Mkdir(resultDirName, os.ModeDir)
+	var err error
+	var header *tar.Header
 
-	for _, f := range reader.Reader.File {
-
-		zipped, err := f.Open()
-		if err != nil {
-			log.Error(err)
-			continue
+	log.Infof("Uploading results to %s", resultDirName)
+	for err == nil {
+		header, err = tarBallReader.Next()
+		if err == nil {
+			err = zu.untar(tarBallReader, header, resultDirName)
 		}
-		zu.unzip(zipped, f, resultDirName)
+	}
+	if hasError(err) {
+		log.Errorf("Error ocured during untar: %s", err)
+		return &resultDirName, err
 	}
 
-	return &resultDirName, err
+	return &resultDirName, nil
 }
 
-func (zu *ZipUploader) unzip(zipped io.ReadCloser, file *zip.File, resultDirName string) {
+func (zu *TarUploader) untar(tarBallReader *tar.Reader, header *tar.Header, resultDirName string) error {
 
-	defer zipped.Close()
-
+	var ret error
 	// get the individual file name and extract the current directory
-	path := filepath.Join("./", resultDirName, file.Name)
+	path := filepath.Join("./", resultDirName, header.Name)
 
-	if file.FileInfo().IsDir() {
-		os.MkdirAll(path, file.Mode())
+	switch header.Typeflag {
+	case tar.TypeDir:
+		// handle directory
 		log.Infof("Creating directory %s", path)
-	} else {
-		writer, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE, file.Mode())
-		if err != nil {
-			log.Error(err)
-			return
-		}
+		ret = os.MkdirAll(path, os.FileMode(header.Mode))
+
+	case tar.TypeReg, tar.TypeRegA:
+		// handle normal file
+		log.Infof("Untarring: %s", path)
+		writer, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE, header.FileInfo().Mode())
 		defer writer.Close()
-		if _, err = io.Copy(writer, zipped); err != nil {
-			log.Error(err)
-			return
+
+		if err == nil {
+			_, err = io.Copy(writer, tarBallReader)
 		}
-		log.Infof("Decompressing: %s", path)
+		ret = err
+	default:
+		log.Warnf("Unable to untar type: %c in file %s", header.Typeflag, header.Name)
 	}
+
+	return ret
+}
+
+func hasError(err error) bool {
+
+	return err != nil && err != io.EOF
 }

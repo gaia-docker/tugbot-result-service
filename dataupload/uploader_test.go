@@ -1,7 +1,7 @@
 package dataupload
 
 import (
-	"archive/zip"
+	"archive/tar"
 	"fmt"
 	"github.com/stretchr/testify/assert"
 	"io/ioutil"
@@ -11,23 +11,24 @@ import (
 	"testing"
 )
 
-const zipFileName = "uploader_test.zip"
+const tarFileName = "uploader_test.tar"
 
 var testFiles = []struct {
 	Name, Body string
 }{
 	{"readme.txt", "This archive contains some text files."},
-	{"tugbot.txt", "tugbot:\tugbot\result\nservice"},
+	{"tugbot.txt", "tugbot:\ntugbot\nresult\nservice"},
 	{"todo.txt", "Get animal handling licence.\nWrite more examples."},
 	{"folder/", ""},
 }
 
 func TestUpload(t *testing.T) {
 
-	createTestZip()
+	createTestTar()
 
-	uploader := &ZipUploader{}
-	resultDir, err := uploader.Upload(zipFileName)
+	uploader := &TarUploader{}
+	reader, err := os.Open(tarFileName)
+	resultDir, err := uploader.Upload(reader)
 
 	assert.NoError(t, err)
 	_, err = os.Stat(*resultDir)
@@ -36,7 +37,7 @@ func TestUpload(t *testing.T) {
 	assert.NoError(t, err)
 	// check that every test file was uploaded
 	for _, f := range testFiles {
-		assert.True(t, existInTestFiles(files, f.Name), fmt.Sprintf("%s should exist in zip file", f.Name))
+		assert.True(t, existInTestFiles(files, f.Name), fmt.Sprintf("%s should exist in tar file", f.Name))
 	}
 
 	cleanup(resultDir)
@@ -44,11 +45,12 @@ func TestUpload(t *testing.T) {
 
 func TestUploadFileNotExist(t *testing.T) {
 
-	uploader := &ZipUploader{}
-	resultDir, err := uploader.Upload("no-file")
+	uploader := &TarUploader{}
+	reader, err := os.Open("no-file")
+	resultDir, err := uploader.Upload(reader)
 
 	assert.Error(t, err)
-	assert.Nil(t, resultDir)
+	cleanup(resultDir)
 }
 
 func existInTestFiles(uploadedFiles []os.FileInfo, expectedFile string) bool {
@@ -64,29 +66,36 @@ func existInTestFiles(uploadedFiles []os.FileInfo, expectedFile string) bool {
 
 func cleanup(resultDir *string) {
 
-	os.Remove(zipFileName)
+	os.Remove(tarFileName)
 	os.RemoveAll(*resultDir)
 }
 
-func createTestZip() {
+func createTestTar() {
 
-	zipfile, err := os.Create(zipFileName)
+	tarfile, err := os.Create(tarFileName)
 	if err != nil {
 		return
 	}
-	defer zipfile.Close()
-	// Create a new zip archive.
-	archive := zip.NewWriter(zipfile)
-	defer archive.Close()
-	// Add some files to the archive.
+	defer tarfile.Close()
+	tw := tar.NewWriter(tarfile)
+	defer tw.Close()
+	// add each file as needed into the current tar archive
 	for _, file := range testFiles {
-		f, err := archive.Create(file.Name)
-		if err != nil {
-			log.Fatal(err)
+		var typeFlag = byte(tar.TypeReg)
+		if strings.HasSuffix(file.Name, "/") {
+			typeFlag = tar.TypeDir
 		}
-		_, err = f.Write([]byte(file.Body))
-		if err != nil {
-			log.Fatal(err)
+		hdr := &tar.Header{
+			Name:     file.Name,
+			Mode:     0600,
+			Size:     int64(len(file.Body)),
+			Typeflag: typeFlag,
+		}
+		if err := tw.WriteHeader(hdr); err != nil {
+			log.Fatalln(err)
+		}
+		if _, err := tw.Write([]byte(file.Body)); err != nil {
+			log.Fatalln(err)
 		}
 	}
 }
