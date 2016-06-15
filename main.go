@@ -8,6 +8,7 @@ import (
 	"github.com/gaia-docker/tugbot-result-service/websocket"
 	"github.com/gorilla/mux"
 	"html/template"
+	"log"
 	"net/http"
 	"net/url"
 )
@@ -38,7 +39,9 @@ func main() {
 	router := mux.NewRouter().StrictSlash(true)
 	router.HandleFunc("/", home).Methods("GET")
 	router.Handle("/echo", websocket.NewEchoHandler(hub)).Methods("GET")
-	router.Handle("/results", dataupload.NewUploadHandler(hub)).Methods("POST").Headers("Accept-Encoding", "gzip")
+	router.Handle("/results", dataupload.NewUploadHandler(hub)).Methods("POST").
+		Headers("Contect-Type", "application/x-gzip").
+		Queries("mainfile", "", "exitcode", "0", "start-time", "", "end-time", "")
 	log.Fatal(http.ListenAndServe(*address, router))
 }
 
