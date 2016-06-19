@@ -8,7 +8,6 @@ import (
 	"github.com/gaia-docker/tugbot-result-service/websocket"
 	"github.com/gorilla/mux"
 	"html/template"
-	"log"
 	"net/http"
 	"net/url"
 )
