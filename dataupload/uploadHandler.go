@@ -7,6 +7,7 @@ import (
 	"github.com/gaia-docker/tugbot-result-service/pool"
 	"io"
 	"net/http"
+	"strings"
 )
 
 // UploadHandler responds to /results http request, which is the result-service rest API for uploading results
@@ -33,7 +34,7 @@ func (uh UploadHandler) ServeHTTP(writer http.ResponseWriter, request *http.Requ
 		log.Error("Error fetching request body. ", err)
 	} else {
 		result, err := uh.uploader.Upload(body)
-		if err != nil {
+		if err == nil {
 			uh.hub.Broadcast(result)
 		}
 	}
@@ -42,10 +43,15 @@ func (uh UploadHandler) ServeHTTP(writer http.ResponseWriter, request *http.Requ
 
 func getBody(request *http.Request) (io.ReadCloser, error) {
 
-	requestBody := request.Body
-	if requestBody == nil {
+	ret := request.Body
+	if ret == nil {
 		return nil, errors.New("Empty request body")
 	}
+	var err error
+	if strings.Contains(request.Header.Get("Content-Type"), "gzip") {
+		log.Debug("Recieved gzip file as body, creating gzip reader... ")
+		ret, err = gzip.NewReader(ret)
+	}
 
-	return gzip.NewReader(requestBody)
+	return ret, err
 }

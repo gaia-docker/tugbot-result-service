@@ -39,8 +39,7 @@ func main() {
 	router.HandleFunc("/", home).Methods("GET")
 	router.Handle("/echo", websocket.NewEchoHandler(hub)).Methods("GET")
 	router.Handle("/results", dataupload.NewUploadHandler(hub)).Methods("POST").
-		Headers("Contect-Type", "application/x-gzip").
-		Queries("mainfile", "", "exitcode", "0", "start-time", "", "end-time", "")
+		Headers("Content-Type", "application/gzip")
 	log.Fatal(http.ListenAndServe(*address, router))
 }
 
