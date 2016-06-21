@@ -9,9 +9,10 @@
     var output = document.getElementById("output");
     var ws;
     var print = function(message) {
-        var d = document.createElement("div");
-        d.innerHTML = message;
+        var d = document.createTextNode(message);
         output.appendChild(d);
+        output.appendChild(document.createElement("br"));
+        output.appendChild(document.createElement("br"));
     };
 
     (function() {
@@ -23,7 +24,7 @@
         }
         ws.onmessage = function(evt) {
             console.log('Data received ' + evt.data);
-            print("Message: " + evt.data);
+            print(evt.data);
         }
     })();
 
