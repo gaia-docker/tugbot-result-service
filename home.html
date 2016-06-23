@@ -9,10 +9,16 @@
     var output = document.getElementById("output");
     var ws;
     var print = function(message) {
-        var d = document.createTextNode(message);
-        output.appendChild(d);
-        output.appendChild(document.createElement("br"));
-        output.appendChild(document.createElement("br"));
+        var iframe = document.createElement('iframe');
+        iframe.frameBorder = 0;
+        document.body.appendChild(iframe);
+        iframe.contentWindow.document.open('text/htmlreplace');
+        iframe.contentWindow.document.write(message);
+        iframe.contentWindow.document.close();
+        iframe.style.height = iframe.contentWindow.document.body.scrollHeight + 'px';
+        iframe.style.width = iframe.contentWindow.document.body.scrollWidth + 'px';
+        document.body.appendChild(document.createElement("br"));
+        document.body.appendChild(document.createElement("br"));
     };
 
     (function() {
