@@ -31,16 +31,15 @@ func NewUploadHandler(hub *pool.Hub) *UploadHandler {
 func (uh UploadHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 
 	retStatus := http.StatusOK
-	body, err := getBody(request)
 	params := request.URL.Query()
-	mainFileName := params.Get("mainfile")
+	body, err := getBody(request)
 	if err != nil {
 		retStatus = http.StatusBadRequest
 		log.Error("Error fetching request body. ", err)
 	} else {
 		resultDir, err := uh.uploader.Upload(body)
 		if err == nil {
-			uh.broadcast(*resultDir, mainFileName)
+			uh.broadcast(*resultDir, params.Get("mainfile"))
 		}
 	}
 	writer.WriteHeader(retStatus)
@@ -48,7 +47,7 @@ func (uh UploadHandler) ServeHTTP(writer http.ResponseWriter, request *http.Requ
 
 func (uh UploadHandler) broadcast(resultDir, mainFileName string) {
 
-	var message string = ""
+	var message string
 	if mainFileName != "" {
 		content, err := ioutil.ReadFile(filepath.Join(resultDir, mainFileName))
 		if err != nil {

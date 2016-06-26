@@ -19,6 +19,8 @@ type Uploader interface {
 type TarUploader struct {
 }
 
+// Upload extracts the given tar file and stores it to a new generated folder in the current directory.
+// The return value is the directory name
 func (zu TarUploader) Upload(fileReader io.ReadCloser) (*string, error) {
 
 	defer fileReader.Close()

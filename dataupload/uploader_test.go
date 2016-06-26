@@ -1,11 +1,10 @@
 package dataupload
 
 import (
-	"archive/tar"
 	"fmt"
+	"github.com/gaia-docker/tugbot-result-service/testutils"
 	"github.com/stretchr/testify/assert"
 	"io/ioutil"
-	"log"
 	"os"
 	"strings"
 	"testing"
@@ -13,9 +12,7 @@ import (
 
 const tarFileName = "uploader_test.tar"
 
-var testFiles = []struct {
-	Name, Body string
-}{
+var testFiles = []testutils.FileDescriptor{
 	{"readme.txt", "This archive contains some text files."},
 	{"tugbot.txt", "tugbot:\ntugbot\nresult\nservice"},
 	{"todo.txt", "Get animal handling licence.\nWrite more examples."},
@@ -24,7 +21,7 @@ var testFiles = []struct {
 
 func TestUpload(t *testing.T) {
 
-	createTestTar()
+	testutils.CreateTarWithName(tarFileName, testFiles)
 
 	uploader := &TarUploader{}
 	reader, err := os.Open(tarFileName)
@@ -40,7 +37,7 @@ func TestUpload(t *testing.T) {
 		assert.True(t, existInTestFiles(files, f.Name), fmt.Sprintf("%s should exist in tar file", f.Name))
 	}
 
-	cleanup(resultDir)
+	cleanup(resultDir, tarFileName)
 }
 
 func TestUploadFileNotExist(t *testing.T) {
@@ -50,7 +47,7 @@ func TestUploadFileNotExist(t *testing.T) {
 	resultDir, err := uploader.Upload(reader)
 
 	assert.Error(t, err)
-	cleanup(resultDir)
+	cleanup(resultDir, "no-file")
 }
 
 func existInTestFiles(uploadedFiles []os.FileInfo, expectedFile string) bool {
@@ -64,38 +61,10 @@ func existInTestFiles(uploadedFiles []os.FileInfo, expectedFile string) bool {
 	return false
 }
 
-func cleanup(resultDir *string) {
+func cleanup(resultDir *string, tarFileName string) {
 
 	os.Remove(tarFileName)
-	os.RemoveAll(*resultDir)
-}
-
-func createTestTar() {
-
-	tarfile, err := os.Create(tarFileName)
-	if err != nil {
-		return
-	}
-	defer tarfile.Close()
-	tw := tar.NewWriter(tarfile)
-	defer tw.Close()
-	// add each file as needed into the current tar archive
-	for _, file := range testFiles {
-		var typeFlag = byte(tar.TypeReg)
-		if strings.HasSuffix(file.Name, "/") {
-			typeFlag = tar.TypeDir
-		}
-		hdr := &tar.Header{
-			Name:     file.Name,
-			Mode:     0600,
-			Size:     int64(len(file.Body)),
-			Typeflag: typeFlag,
-		}
-		if err := tw.WriteHeader(hdr); err != nil {
-			log.Fatalln(err)
-		}
-		if _, err := tw.Write([]byte(file.Body)); err != nil {
-			log.Fatalln(err)
-		}
+	if resultDir != nil {
+		os.RemoveAll(*resultDir)
 	}
 }

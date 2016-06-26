@@ -50,7 +50,7 @@ func TestBroadcast(t *testing.T) {
 	hub.Broadcast(&message)
 	hub.Unregister(connection1)
 
-	close(hub.broadcast)
+	hub.CloseBroadcastChannel()
 }
 
 func TestBroadcastWithConnectionNotListening(t *testing.T) {
@@ -67,5 +67,5 @@ func TestBroadcastWithConnectionNotListening(t *testing.T) {
 	hub.Broadcast(&message)
 	hub.Unregister(connection1)
 
-	close(hub.broadcast)
+	hub.CloseBroadcastChannel()
 }

@@ -84,6 +84,12 @@ func (h *Hub) Broadcast(message *string) {
 	h.broadcast <- []byte(*message)
 }
 
+// CloseBroadcastChannel closes broadcast channel
+func (h *Hub) CloseBroadcastChannel() {
+
+	close(h.broadcast)
+}
+
 func (h *Hub) closeConnection(conn *Connection) {
 
 	log.Infof("Closing connection: %+v", conn)

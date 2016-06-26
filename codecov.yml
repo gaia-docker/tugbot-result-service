@@ -1,3 +1,4 @@
 coverage:
   ignore:
     - "pool/websocketmock.go"
+    - "testutils/*"
