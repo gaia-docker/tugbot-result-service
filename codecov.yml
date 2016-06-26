@@ -1,3 +1,3 @@
 coverage:
   ignore:
-    - "pool/websocketmock"
+    - "pool/websocketmock.go"
