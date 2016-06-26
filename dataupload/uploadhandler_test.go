@@ -24,12 +24,22 @@ func TestUploadHandlerEmptyBody(t *testing.T) {
 
 func TestUploadHandler(t *testing.T) {
 
+	testUploadHandler(t, "/results?mainfile=tugbot.txt")
+}
+
+func TestUploadHandlerNoMainfile(t *testing.T) {
+
+	testUploadHandler(t, "/results")
+}
+
+func testUploadHandler(t *testing.T, urlSuffix string) {
+
 	testFile := "test.tar.gz"
 	createTestGzip(testFile)
 	hub := pool.NewHub()
 	go hub.Run()
 
-	code := uploadResults(t, hub, testFile)
+	code := uploadResults(t, hub, testFile, urlSuffix)
 	assert.Equal(t, http.StatusOK, code)
 
 	matches, _ := filepath.Glob("resultService*")
@@ -37,13 +47,13 @@ func TestUploadHandler(t *testing.T) {
 	hub.CloseBroadcastChannel()
 }
 
-func uploadResults(t *testing.T, hub *pool.Hub, testFile string) int {
+func uploadResults(t *testing.T, hub *pool.Hub, testFile, urlSuffix string) int {
 
 	file, err := os.Open(testFile)
 	assert.NoError(t, err)
 	defer file.Close()
 
-	req, err := http.NewRequest("POST", "/results?mainfile=tugbot.txt", file)
+	req, err := http.NewRequest("POST", urlSuffix, file)
 	assert.NoError(t, err)
 
 	req.Header.Add("Content-Type", "gzip")
