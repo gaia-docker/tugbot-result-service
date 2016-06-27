@@ -27,10 +27,11 @@ func (eh *EchoHandler) ServeHTTP(writer http.ResponseWriter, request *http.Reque
 	ws, err := upgrader.Upgrade(writer, request, nil)
 	if err != nil {
 		log.Errorf("Failed upgrading connection to web socket %+v", err)
-		return
+	} else {
+		log.Infof("New websocket connection established")
+		conn := pool.NewConnection(ws)
+		eh.hub.Register(conn)
+		go conn.Listen(eh.hub.Unregister)
+		writer.WriteHeader(http.StatusOK)
 	}
-	log.Infof("New websocket connection established")
-	conn := pool.NewConnection(ws)
-	eh.hub.Register(conn)
-	go conn.Listen(eh.hub.Unregister)
 }
