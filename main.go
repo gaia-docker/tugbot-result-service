@@ -41,8 +41,8 @@ func main() {
 	router.Handle("/echo", websocket.NewEchoHandler(hub)).Methods("GET")
 	router.Handle("/results", dataupload.NewUploadHandler(hub)).Methods("POST").
 		Headers("Content-Type", "application/gzip")
-	log.Fatal(http.ListenAndServe(*address, router))
 	log.Infof("Listening on %s", address)
+	log.Fatal(http.ListenAndServe(*address, router))
 }
 
 func home(w http.ResponseWriter, r *http.Request) {

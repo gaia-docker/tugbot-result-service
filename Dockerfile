@@ -6,4 +6,6 @@ WORKDIR $RESULT_SERVICE_DIR
 
 COPY .dist/tugbot-result-service /usr/bin/tugbot-result-service
 
+RUN ls -lh /usr/bin/tugbot-result-service
+
 CMD ["/usr/bin/tugbot-result-service"]
