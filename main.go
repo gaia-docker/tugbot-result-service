@@ -34,6 +34,7 @@ func init() {
 
 func main() {
 
+	log.Info("Starting tugbot-result-service...")
 	go hub.Run()
 	router := mux.NewRouter().StrictSlash(true)
 	router.HandleFunc("/", home).Methods("GET")
@@ -41,6 +42,7 @@ func main() {
 	router.Handle("/results", dataupload.NewUploadHandler(hub)).Methods("POST").
 		Headers("Content-Type", "application/gzip")
 	log.Fatal(http.ListenAndServe(*address, router))
+	log.Infof("Listening on %s", address)
 }
 
 func home(w http.ResponseWriter, r *http.Request) {
