@@ -12,6 +12,30 @@ Implements [Result Service API](https://github.com/gaia-docker/tugbot/blob/maste
 and exposes websocket which present live stream of test results.
 
 ## Usage
+```
+$ tugbot-result-service help
+
+NAME:
+   tugbot-result-service - Implements Result Service API and exposes websocket which present live stream of test results.
+
+USAGE:
+   tugbot-result-service [global options] command [command options] [arguments...]
+
+VERSION:
+   1.0.0
+
+COMMANDS:
+     help, h  Shows a list of commands or help for one command
+
+GLOBAL OPTIONS:
+   --address value, -a value   http service address (default: "localhost:8080")
+   --loglevel value, -l value  log level (default: "debug")
+   --help, -h                  show help
+   --version, -v               print the version
+```
+
+## Run as docker container
 `docker run -it --name result-service gaiadocker/tugbot-result-service`
 
-Open `http://result-service-host:8080` to view live stream.
+## View live stream
+Open `http://result-service-host:8080`.
