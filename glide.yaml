@@ -9,7 +9,9 @@ import:
 - package: github.com/gorilla/websocket
   subpackages:
   - github.com\gorilla\websocket
+- package: github.com/urfave/cli
+  subpackages:
+  - github.com\urfave\cli
 - package: github.com/stretchr/testify/assert
   subpackages:
   - github.com\stretchr\testify\assert
-- package: github.com/urfave/cli
