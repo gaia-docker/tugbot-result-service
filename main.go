@@ -18,7 +18,7 @@ var address = flag.String("address", "localhost:8080", "http service address")
 
 var loglevel = flag.String("loglevel", defaultLogLevel.String(), "log level")
 
-var homeTemplate = template.Must(template.ParseFiles("home.html"))
+var homeTemplate = template.Must(template.ParseFiles("views/home.html"))
 
 var hub = pool.NewHub()
 
@@ -41,7 +41,7 @@ func main() {
 	router.Handle("/echo", websocket.NewEchoHandler(hub)).Methods("GET")
 	router.Handle("/results", dataupload.NewUploadHandler(hub)).Methods("POST").
 		Headers("Content-Type", "application/gzip")
-	log.Infof("Listening on %s", address)
+	log.Infof("Listening on %s", *address)
 	log.Fatal(http.ListenAndServe(*address, router))
 }
 

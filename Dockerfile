@@ -4,10 +4,8 @@ ENV RESULT_SERVICE_DIR /go/src/github.com/gaia-docker/tugbot-result-service
 
 WORKDIR $RESULT_SERVICE_DIR
 
-COPY .dist/tugbot-result-service /usr/bin/tugbot-result-service
+ADD views $RESULT_SERVICE_DIR/views
 
-COPY home.html /usr/bin/home.html
+ADD .dist/tugbot-result-service $RESULT_SERVICE_DIR/tugbot-result-service
 
-RUN ls -lh /usr/bin/tugbot-result-service
-
-CMD ["/usr/bin/tugbot-result-service"]
+ENTRYPOINT tugbot-result-service
