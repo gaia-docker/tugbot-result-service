@@ -13,5 +13,3 @@ import:
   subpackages:
   - github.com\stretchr\testify\assert
 - package: github.com/urfave/cli
-  subpackages:
-  - github.com\urfave\cli
