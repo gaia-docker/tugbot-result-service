@@ -63,7 +63,7 @@ func start(c *cli.Context) error {
 		Headers("Content-Type", "application/gzip")
 	log.Infof("Listening on port %s", port)
 
-	return http.ListenAndServe(fmt.Sprintf("localhost:%s", port), router)
+	return http.ListenAndServe(fmt.Sprintf(":%s", port), router)
 }
 
 func home(w http.ResponseWriter, r *http.Request) {
