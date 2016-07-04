@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	log "github.com/Sirupsen/logrus"
 	"github.com/gaia-docker/tugbot-result-service/dataupload"
 	"github.com/gaia-docker/tugbot-result-service/pool"
@@ -15,7 +16,7 @@ import (
 
 const defaultLogLevel = log.DebugLevel
 
-var address string
+var port string
 
 var loglevel string
 
@@ -29,10 +30,10 @@ func main() {
 	app.Version = "1.0.0"
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
-			Name:        "address, a",
-			Value:       "localhost:8080",
-			Usage:       "http service address",
-			Destination: &address,
+			Name:        "port, p",
+			Value:       "8080",
+			Usage:       "http service port",
+			Destination: &port,
 		},
 		cli.StringFlag{
 			Name:        "loglevel, l",
@@ -60,9 +61,9 @@ func start(c *cli.Context) error {
 	router.Handle("/echo", websocket.NewEchoHandler(hub)).Methods("GET")
 	router.Handle("/results", dataupload.NewUploadHandler(hub)).Methods("POST").
 		Headers("Content-Type", "application/gzip")
-	log.Infof("Listening on %s", address)
+	log.Infof("Listening on port %s", port)
 
-	return http.ListenAndServe(address, router)
+	return http.ListenAndServe(fmt.Sprintf("localhost:%s", port), router)
 }
 
 func home(w http.ResponseWriter, r *http.Request) {
@@ -75,6 +76,6 @@ func home(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
 		return
 	}
-	var wsAddress = url.URL{Scheme: "ws", Host: address, Path: "/echo"}
+	var wsAddress = url.URL{Scheme: "ws", Host: fmt.Sprintf("localhost:%s", port), Path: "/echo"}
 	homeTemplate.Execute(w, wsAddress.String())
 }
