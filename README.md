@@ -35,7 +35,7 @@ GLOBAL OPTIONS:
 ```
 
 ## Run as docker container
-`docker run -it --name result-service gaiadocker/tugbot-result-service`
+`docker run -it --name result-service -p 8080:8080 gaiadocker/tugbot-result-service`
 
 ## View live stream
 Open `http://result-service-host:8080`.
