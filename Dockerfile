@@ -8,4 +8,4 @@ ADD views $RESULT_SERVICE_DIR/views
 
 ADD .dist/tugbot-result-service $RESULT_SERVICE_DIR/tugbot-result-service
 
-ENTRYPOINT tugbot-result-service
+CMD ["./tugbot-result-service"]
