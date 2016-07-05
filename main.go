@@ -76,6 +76,8 @@ func home(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
 		return
 	}
-	var wsAddress = url.URL{Scheme: "ws", Host: fmt.Sprintf("localhost:%s", port), Path: "/echo"}
+
+	var wsAddress = url.URL{Scheme: "ws", Host: r.Host, Path: "/echo"}
+	log.Debugf("Openning web socket on address %s", wsAddress)
 	homeTemplate.Execute(w, wsAddress.String())
 }
