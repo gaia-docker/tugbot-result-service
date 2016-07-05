@@ -8,8 +8,10 @@
 <script type="text/javascript">
     var output = document.getElementById("output");
     var ws;
+    var messageIndex = 0;
     var print = function(message) {
         var iframe = document.createElement('iframe');
+        iframe.id = (++messageIndex).toString();
         iframe.frameBorder = 0;
         document.body.appendChild(iframe);
         iframe.contentWindow.document.open('text/htmlreplace');
@@ -19,6 +21,7 @@
         iframe.style.width = iframe.contentWindow.document.body.scrollWidth + 'px';
         document.body.appendChild(document.createElement("br"));
         document.body.appendChild(document.createElement("br"));
+        window.location = "#" + iframe.id
     };
 
     (function() {
