@@ -28,7 +28,7 @@ COMMANDS:
      help, h  Shows a list of commands or help for one command
 
 GLOBAL OPTIONS:
-   --address value, -a value   http service address (default: "localhost:8080")
+   --port value, -p value   http service port (default: "8080")
    --loglevel value, -l value  log level (default: "debug")
    --help, -h                  show help
    --version, -v               print the version
