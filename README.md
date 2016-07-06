@@ -38,8 +38,10 @@ GLOBAL OPTIONS:
 ## Run as docker container
 `docker run -it --name result-service -p 8080:8080 gaiadocker/tugbot-result-service`
 
+## View live stream
+Open `http://<result-service-host>:8080`.
+
 ## Test the service using curl
 `curl -i -X POST http://<result-service-host>:8080/results?mainfile=<file inside tar.gz to echo> -H "Content-Type: application/gzip" --data-binary "@<path to tar.gz file>"`
 
-## View live stream
-Open `http://<result-service-host>:8080`.
+After that you should see the file echoed in the live stream
